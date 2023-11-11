@@ -40,10 +40,11 @@ export default function Channel() {
         borderRightColor="gray.200"
         overflowY="scroll"
       >
-        <User username={login ?? ''} />
-        {users.map((user) => (
-          <User key={user.id} username={user.username} />
-        ))}
+        {users
+          .filter((user) => user.channel === parseInt(params.id as string, 10))
+          .map((user) => (
+            <User key={user.id} username={user.username} />
+          ))}
       </VStack>
       <VStack flex={1} p={4} height="100vh">
         <Heading as="h1" size="xs" fontWeight="100" color="gray.300" textAlign="center">

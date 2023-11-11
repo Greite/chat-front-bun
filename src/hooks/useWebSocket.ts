@@ -92,19 +92,25 @@ export const useWebSocket = () => {
     }
   }, [toast, webSocket])
 
+  const buildWebSocketMessage = (content: string, type: WebSocketMessageType): WebSocketMessage => {
+    const data: WebSocketMessage = {
+      id: uuid(),
+      type,
+      content,
+      username: login ?? '',
+      date: new Date(),
+      channel: channel ?? 0,
+    }
+
+    return data
+  }
+
   const sendMessage = (message: string) => {
     if (!webSocket || webSocket.readyState !== WebSocket.OPEN) {
       return
     }
 
-    const data: WebSocketMessage = {
-      id: uuid(),
-      type: WebSocketMessageType.Message,
-      content: message,
-      username: login ?? '',
-      date: new Date(),
-      channel: channel ?? 0,
-    }
+    const data = buildWebSocketMessage(message, WebSocketMessageType.Message)
 
     messages.push(data)
     setMessages([...messages])
@@ -162,6 +168,12 @@ export const useWebSocket = () => {
     setUsers([...users])
   }
 
+  const updateUsersList = (data: WebSocketMessage) => {
+    const userList = JSON.parse(data.content) as string[]
+
+    setUsers(Object.values(userList).map((user) => JSON.parse(user) as WebSocketMessage))
+  }
+
   useEffect(() => {
     if (!webSocket || !login || !channel) {
       return () => {}
@@ -179,6 +191,9 @@ export const useWebSocket = () => {
           break
         case WebSocketMessageType.Leave:
           userLoggedOut(data)
+          break
+        case WebSocketMessageType.UserList:
+          updateUsersList(data)
           break
         default:
           break
