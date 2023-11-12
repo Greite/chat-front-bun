@@ -9,8 +9,19 @@ import { SocketContext } from '@/app/SocketProvider'
 
 // eslint-disable-next-line import/prefer-default-export
 export const useWebSocket = () => {
-  const { webSocket, setWebSocket, login, setLogin, channel, setChannel, messages, setMessages, users, setUsers } =
-    useContext(SocketContext)
+  const {
+    webSocket,
+    setWebSocket,
+    login,
+    setLogin,
+    channel,
+    setChannel,
+    messages,
+    setMessages,
+    users,
+    setUsers,
+    userId,
+  } = useContext(SocketContext)
   const toast = useToast()
 
   useEffect(() => {
@@ -18,9 +29,11 @@ export const useWebSocket = () => {
       return
     }
 
-    const ws = new WebSocket(`ws://gauthierpainteaux.fr:3002/chat?username=${encodeURI(login)}&channel=${channel}`)
+    const ws = new WebSocket(
+      `ws://gauthierpainteaux.fr:3002/chat?id=${userId}&username=${encodeURI(login)}&channel=${channel}`,
+    )
     setWebSocket(ws)
-  }, [login, channel, setWebSocket, webSocket])
+  }, [login, channel, setWebSocket, webSocket, userId])
 
   useEffect(() => {
     if (!webSocket || !login || !channel) {
@@ -29,7 +42,9 @@ export const useWebSocket = () => {
 
     const onClose = () => {
       setTimeout(() => {
-        const ws = new WebSocket(`ws://gauthierpainteaux.fr:3002/chat?username=${encodeURI(login)}&channel=${channel}`)
+        const ws = new WebSocket(
+          `ws://gauthierpainteaux.fr:3002/chat?id=${userId}&username=${encodeURI(login)}&channel=${channel}`,
+        )
         setWebSocket(ws)
       }, 5000)
     }
@@ -39,7 +54,7 @@ export const useWebSocket = () => {
     return () => {
       webSocket.removeEventListener('close', onClose)
     }
-  }, [webSocket, login, channel, setWebSocket])
+  }, [webSocket, login, channel, setWebSocket, userId])
 
   useEffect(() => {
     if (!webSocket || !login || !channel) {
@@ -50,7 +65,7 @@ export const useWebSocket = () => {
       const data: WebSocketMessage = {
         id: uuid(),
         type: WebSocketMessageType.Leave,
-        content: '',
+        content: userId ?? '',
         username: login ?? '',
         date: new Date(),
         channel: channel ?? 0,
@@ -68,7 +83,7 @@ export const useWebSocket = () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       window.removeEventListener('beforeunload', onAppClose)
     }
-  }, [webSocket, login, channel])
+  }, [webSocket, login, channel, userId])
 
   useEffect(() => {
     if (!webSocket) {

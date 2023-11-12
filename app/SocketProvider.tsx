@@ -1,6 +1,7 @@
 import { createContext, PropsWithChildren, useMemo, useState } from 'react'
 
 import { WebSocketMessage } from '@/src/types/WebSocketMessage'
+import uuid from '@/src/utils/uuid'
 
 interface IWebSocket {
   webSocket: WebSocket | undefined
@@ -13,6 +14,7 @@ interface IWebSocket {
   setMessages: (messages: WebSocketMessage[]) => void
   users: WebSocketMessage[]
   setUsers: (users: WebSocketMessage[]) => void
+  userId: string
 }
 
 export const SocketContext = createContext<IWebSocket>({
@@ -26,6 +28,7 @@ export const SocketContext = createContext<IWebSocket>({
   setMessages: () => {},
   users: [],
   setUsers: () => {},
+  userId: '',
 })
 
 export function SocketProvider({ children }: PropsWithChildren) {
@@ -34,6 +37,7 @@ export function SocketProvider({ children }: PropsWithChildren) {
   const [channel, setChannel] = useState<number>()
   const [messages, setMessages] = useState<WebSocketMessage[]>([])
   const [users, setUsers] = useState<WebSocketMessage[]>([])
+  const [userId] = useState<string>(uuid())
 
   const WebSocketContext = useMemo(
     () => ({
@@ -47,8 +51,9 @@ export function SocketProvider({ children }: PropsWithChildren) {
       setMessages,
       users,
       setUsers,
+      userId,
     }),
-    [webSocket, setWebSocket, login, setLogin, channel, setChannel, messages, setMessages, users, setUsers],
+    [webSocket, setWebSocket, login, setLogin, channel, setChannel, messages, setMessages, users, setUsers, userId],
   )
 
   return <SocketContext.Provider value={WebSocketContext}>{children}</SocketContext.Provider>
