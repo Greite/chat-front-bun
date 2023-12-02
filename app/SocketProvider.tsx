@@ -5,11 +5,11 @@ import uuid from '@/src/utils/uuid'
 
 interface IWebSocket {
   webSocket: WebSocket | undefined
-  setWebSocket: (webSocket: WebSocket) => void
+  setWebSocket: (webSocket: WebSocket | undefined) => void
   login: string | undefined
-  setLogin: (login: string) => void
+  setLogin: (login: string | undefined) => void
   channel: number | undefined
-  setChannel: (channel: number) => void
+  setChannel: (channel: number | undefined) => void
   messages: WebSocketMessage[]
   setMessages: (messages: WebSocketMessage[]) => void
   users: WebSocketMessage[]
@@ -32,7 +32,7 @@ export const SocketContext = createContext<IWebSocket>({
 })
 
 export function SocketProvider({ children }: PropsWithChildren) {
-  const [webSocket, setWebSocket] = useState<WebSocket>()
+  const [webSocket, setWebSocket] = useState<WebSocket | undefined>()
   const [login, setLogin] = useState<string>()
   const [channel, setChannel] = useState<number>()
   const [messages, setMessages] = useState<WebSocketMessage[]>([])

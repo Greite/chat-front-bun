@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react'
 
 import ChatBar from '@/src/components/ChatBar'
 import Message from '@/src/components/Message'
+import OptionsDrawer from '@/src/components/OptionsDrawer'
 import User from '@/src/components/User'
 import { useWebSocket } from '@/src/hooks/useWebSocket'
 import scrollToBottom from '@/src/utils/scrollToBottom'
@@ -13,6 +14,7 @@ import scrollToBottom from '@/src/utils/scrollToBottom'
 export default function Channel() {
   const params = useParams()
   const { login, messages, users } = useWebSocket()
+
   const messagesBoxRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -47,10 +49,21 @@ export default function Channel() {
           ))}
       </VStack>
       <VStack flex={1} p={4} height="100vh">
-        <Heading as="h1" size="xs" fontWeight="100" color="gray.300" textAlign="center">
+        <Heading as="h1" size="xs" fontWeight="100" color="gray.500" textAlign="center">
           You&apos;re chatting on channel {params.id}
         </Heading>
-        <Flex ref={messagesBoxRef} w="full" flexGrow={1} gap={3} flexDirection="column" overflowY="scroll">
+        <Flex
+          ref={messagesBoxRef}
+          w="full"
+          flexGrow={1}
+          gap={3}
+          mt={7}
+          pt={4}
+          flexDirection="column"
+          overflowY="scroll"
+          borderTop="1px solid"
+          borderTopColor="gray.200"
+        >
           {messages.map((message) => {
             if (message.channel !== parseInt(params.id as string, 10)) {
               return null
@@ -69,6 +82,7 @@ export default function Channel() {
         </Flex>
         <ChatBar />
       </VStack>
+      <OptionsDrawer />
     </HStack>
   )
 }

@@ -56,23 +56,32 @@ export const useWebSocket = () => {
     }
   }, [webSocket, login, channel, setWebSocket, userId])
 
+  const closeWebSocket = () => {
+    if (!webSocket) {
+      return
+    }
+
+    const data: WebSocketMessage = {
+      id: uuid(),
+      type: WebSocketMessageType.Leave,
+      content: userId ?? '',
+      username: login ?? '',
+      date: new Date(),
+      channel: channel ?? 0,
+    }
+    webSocket.send(JSON.stringify(data))
+    setLogin(undefined)
+    setChannel(undefined)
+    setWebSocket(undefined)
+    webSocket.close()
+  }
+
   useEffect(() => {
     if (!webSocket || !login || !channel) {
       return () => {}
     }
 
-    const onAppClose = () => {
-      const data: WebSocketMessage = {
-        id: uuid(),
-        type: WebSocketMessageType.Leave,
-        content: userId ?? '',
-        username: login ?? '',
-        date: new Date(),
-        channel: channel ?? 0,
-      }
-      webSocket.send(JSON.stringify(data))
-      webSocket.close()
-    }
+    const onAppClose = () => closeWebSocket()
 
     // @ts-expect-error - window is indeed defined
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -93,6 +102,7 @@ export const useWebSocket = () => {
     switch (webSocket.readyState) {
       case WebSocket.CLOSING:
       case WebSocket.CLOSED:
+        toast.closeAll()
         toast({
           title: 'Connection lost',
           description: 'Trying to reconnect...',
@@ -231,5 +241,6 @@ export const useWebSocket = () => {
     setChannel,
     messages,
     users,
+    closeWebSocket,
   }
 }
